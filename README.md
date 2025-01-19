@@ -1,6 +1,6 @@
 # Cloud Foundry MCP Server
 
-This MCP Server provides an LLM interface for interacting with [Spring Application Advisor](https://techdocs.broadcom.com/us/en/vmware-tanzu/spring/tanzu-spring/commercial/spring-tanzu/app-advisor-what-is-app-advisor.html). It was built with the [Spring AI MCP](https://spring.io/blog/2024/12/11/spring-ai-mcp-announcement) project.
+This MCP Server provides an LLM interface for interacting with [Spring Application Advisor](https://techdocs.broadcom.com/us/en/vmware-tanzu/spring/tanzu-spring/commercial/spring-tanzu/app-advisor-what-is-app-advisor.html). It was built with the [Spring AI MCP](https://spring.io/blog/2024/12/11/spring-ai-mcp-announcement) project, based on an implementation by @Albertoimpl
 
 ![Sample](images/sample.png)
 
