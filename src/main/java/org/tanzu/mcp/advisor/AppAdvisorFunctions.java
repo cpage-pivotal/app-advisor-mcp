@@ -1,7 +1,5 @@
 package org.tanzu.mcp.advisor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +10,6 @@ import java.io.InputStreamReader;
 @Component
 public class AppAdvisorFunctions {
     @Value("${ADVISOR_SERVER:http://localhost:8080}") private String appAdvisorUrl;
-    private static final Logger logger = LoggerFactory.getLogger(AppAdvisorFunctions.class);
 
     public String advisorBuildConfigGet(String pathToSourceCode) throws IOException, InterruptedException {
         return executeCommand("advisor build-config get -p " + pathToSourceCode);
@@ -31,8 +28,6 @@ public class AppAdvisorFunctions {
         processBuilder.command("sh", "-c", command);
         processBuilder.redirectErrorStream(true);
         processBuilder.environment().put("ADVISOR_SERVER", appAdvisorUrl);
-        logger.info("Executing command: " + command);
-        logger.info("Advisor server url: " + appAdvisorUrl);
 
         // Capture the output
         Process process = processBuilder.start();
