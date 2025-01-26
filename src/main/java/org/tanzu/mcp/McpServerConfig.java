@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.server.McpAsyncServer;
 import org.springframework.ai.mcp.server.McpServer;
+import org.springframework.ai.mcp.server.McpServerFeatures;
 import org.springframework.ai.mcp.server.transport.StdioServerTransport;
 import org.springframework.ai.mcp.server.transport.WebMvcSseServerTransport;
 import org.springframework.ai.mcp.spec.McpSchema;
@@ -58,19 +59,19 @@ public class McpServerConfig implements WebMvcConfigurer {
 			.build();
 
 		// Create the server with both tool and resource capabilities
-		var server = McpServer.using(transport).
+		var server = McpServer.async(transport).
 				serverInfo("Spring Application Advisor MCP Server", "1.0.0").
 				capabilities(capabilities).
 				tools(getBuildConfigTool(),getUpgradePlanGetTool(),getUpgradePlanApplyTool()).
-				async();
+				build();
 		
 		return server;
 	}
 
 	private static final String DESCRIPTION_ADVISOR_BUILD_CONFIG_GET = "Generate the build configuration of the source " +
 			"code repository. This configuration can be used to perform version upgrades of Spring applications.Returns the output of the process.";
-	private McpServer.ToolRegistration getBuildConfigTool() {
-		return new McpServer.ToolRegistration(
+	private McpServerFeatures.AsyncToolRegistration getBuildConfigTool() {
+		return new McpServerFeatures.AsyncToolRegistration(
 				new McpSchema.Tool("advisorBuildConfigGet", DESCRIPTION_ADVISOR_BUILD_CONFIG_GET,
 				"""
 						{
@@ -91,8 +92,8 @@ public class McpServerConfig implements WebMvcConfigurer {
 			"This function depends on advisorBuildConfigGet to generate the build configuration file. " +
 			"That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
 			"Returns the output of the process.";
-	private McpServer.ToolRegistration getUpgradePlanGetTool() {
-		return new McpServer.ToolRegistration(
+	private McpServerFeatures.AsyncToolRegistration getUpgradePlanGetTool() {
+		return new McpServerFeatures.AsyncToolRegistration(
 				new McpSchema.Tool("advisorUpgradePlanGet", DESCRIPTION_ADVISOR_UPGRADE_PLAN_GET,
 						"""
                                 {
@@ -114,8 +115,8 @@ public class McpServerConfig implements WebMvcConfigurer {
 			"That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
 			"Verify with the user before performing the apply. " +
 			"Use this method to perform all version upgrades of Spring applications. Returns the output of the process.";
-	private McpServer.ToolRegistration getUpgradePlanApplyTool() {
-		return new McpServer.ToolRegistration(
+	private McpServerFeatures.AsyncToolRegistration getUpgradePlanApplyTool() {
+		return new McpServerFeatures.AsyncToolRegistration(
 				new McpSchema.Tool("advisorUpgradePlanApply", DESCRIPTION_ADVISOR_UPGRADE_PLAN_APPLY,
 						"""
                                 {

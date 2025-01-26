@@ -18,7 +18,7 @@
     <description>Spring AI MCP server that enables interaction with Spring Application Advisor</description>
 
     <properties>
-        <spring-ai-mcp.version>0.5.1</spring-ai-mcp.version>
+        <spring-ai-mcp.version>0.6.0</spring-ai-mcp.version>
     </properties>
 
     <dependencyManagement>
