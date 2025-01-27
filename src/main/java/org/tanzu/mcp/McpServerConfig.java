@@ -13,15 +13,12 @@ import org.springframework.ai.mcp.spec.ServerMcpTransport;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 import org.tanzu.mcp.advisor.AppAdvisorFunctions;
 
 @Configuration
-@EnableWebMvc
-public class McpServerConfig implements WebMvcConfigurer {
+public class McpServerConfig {
 
 	private static final Logger logger = LoggerFactory.getLogger(McpServerConfig.class);
 	private final AppAdvisorFunctions appAdvisorFunctions;
