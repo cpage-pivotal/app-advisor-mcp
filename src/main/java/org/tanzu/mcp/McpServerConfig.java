@@ -3,7 +3,7 @@ package org.tanzu.mcp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.mcp.server.McpAsyncServer;
+import org.springframework.ai.mcp.server.McpSyncServer;
 import org.springframework.ai.mcp.server.McpServer;
 import org.springframework.ai.mcp.server.McpServerFeatures;
 import org.springframework.ai.mcp.server.transport.StdioServerTransport;
@@ -46,7 +46,7 @@ public class McpServerConfig {
 	}
 
 	@Bean
-	public McpAsyncServer mcpServer(ServerMcpTransport transport) {
+	public McpSyncServer mcpServer(ServerMcpTransport transport) {
 
 		var capabilities = McpSchema.ServerCapabilities.builder()
 			.resources(false, false)
@@ -56,7 +56,7 @@ public class McpServerConfig {
 			.build();
 
 		// Create the server with both tool and resource capabilities
-		var server = McpServer.async(transport).
+		var server = McpServer.sync(transport).
 				serverInfo("Spring Application Advisor MCP Server", "1.0.0").
 				capabilities(capabilities).
 				tools(getBuildConfigTool(),getUpgradePlanGetTool(),getUpgradePlanApplyTool()).
@@ -67,8 +67,8 @@ public class McpServerConfig {
 
 	private static final String DESCRIPTION_ADVISOR_BUILD_CONFIG_GET = "Generate the build configuration of the source " +
 			"code repository. This configuration can be used to perform version upgrades of Spring applications.Returns the output of the process.";
-	private McpServerFeatures.AsyncToolRegistration getBuildConfigTool() {
-		return new McpServerFeatures.AsyncToolRegistration(
+	private McpServerFeatures.SyncToolRegistration getBuildConfigTool() {
+		return new McpServerFeatures.SyncToolRegistration(
 				new McpSchema.Tool("advisorBuildConfigGet", DESCRIPTION_ADVISOR_BUILD_CONFIG_GET,
 				"""
 						{
@@ -76,7 +76,7 @@ public class McpServerConfig {
 							"properties": {
 								"pathToSourceCode": {
 									"type": "string",
-									"description": "The directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
+									"description": "The full directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
 								}
 							},
 							"required": ["pathToSourceCode"]
@@ -89,8 +89,8 @@ public class McpServerConfig {
 			"This function depends on advisorBuildConfigGet to generate the build configuration file. " +
 			"That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
 			"Returns the output of the process.";
-	private McpServerFeatures.AsyncToolRegistration getUpgradePlanGetTool() {
-		return new McpServerFeatures.AsyncToolRegistration(
+	private McpServerFeatures.SyncToolRegistration getUpgradePlanGetTool() {
+		return new McpServerFeatures.SyncToolRegistration(
 				new McpSchema.Tool("advisorUpgradePlanGet", DESCRIPTION_ADVISOR_UPGRADE_PLAN_GET,
 						"""
                                 {
@@ -98,7 +98,7 @@ public class McpServerConfig {
                                     "properties": {
                                         "pathToSourceCode": {
                                             "type": "string",
-                                            "description": "The directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
+                                            "description": "The full directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
                                         }
                                     },
                                     "required": ["pathToSourceCode"]
@@ -112,8 +112,8 @@ public class McpServerConfig {
 			"That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
 			"Verify with the user before performing the apply. " +
 			"Use this method to perform all version upgrades of Spring applications. Returns the output of the process.";
-	private McpServerFeatures.AsyncToolRegistration getUpgradePlanApplyTool() {
-		return new McpServerFeatures.AsyncToolRegistration(
+	private McpServerFeatures.SyncToolRegistration getUpgradePlanApplyTool() {
+		return new McpServerFeatures.SyncToolRegistration(
 				new McpSchema.Tool("advisorUpgradePlanApply", DESCRIPTION_ADVISOR_UPGRADE_PLAN_APPLY,
 						"""
                                 {
@@ -121,7 +121,7 @@ public class McpServerConfig {
                                     "properties": {
                                         "pathToSourceCode": {
                                             "type": "string",
-                                            "description": "The directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
+                                            "description": "The full directory path to the source code. Use the path of the current IDE project if possible. If you can not determine the path yourself, ask the user to provide it."
                                         }
                                     },
                                     "required": ["pathToSourceCode"]

@@ -4,6 +4,10 @@ This MCP Server provides an LLM interface for interacting with [Spring Applicati
 
 ![Sample](images/sample.png)
 
+## Prerequisites
+
+You need to install the [Advisor CLI](https://techdocs.broadcom.com/us/en/vmware-tanzu/spring/tanzu-spring/commercial/spring-tanzu/app-advisor-run-app-advisor-cli.html) in the path on your machine.
+
 ## Building the Server
 
 ```bash
