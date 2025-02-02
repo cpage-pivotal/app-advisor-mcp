@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.6</version>
+        <version>3.4.2</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
@@ -14,7 +14,7 @@
     <artifactId>app-advisor-mcp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>MCP Server for Cloud Foundry</name>
+    <name>MCP Server for App Advisor</name>
     <description>Spring AI MCP server that enables interaction with Spring Application Advisor</description>
 
     <properties>
@@ -67,13 +67,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
