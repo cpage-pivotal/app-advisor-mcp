@@ -1,43 +1,59 @@
 package org.tanzu.mcp.advisor;
 
-import org.springframework.ai.mcp.spec.McpSchema;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class AppAdvisorFunctions {
-    @Value("${ADVISOR_SERVER:http://localhost:8080}") private String appAdvisorUrl;
+    @Value("${ADVISOR_SERVER:http://localhost:8080}")
+    private String appAdvisorUrl;
 
-    public Function<Map<String, Object>, McpSchema.CallToolResult> advisorBuildConfigGetFunction() {
-        return arguments -> {
-            String pathToSourceCode = (String) arguments.get("pathToSourceCode");
-            return executeCommand("advisor build-config get -p " + pathToSourceCode);
-        };
+    private static final String ADVISOR_BUILD_CONFIG_GET = "Generate the build configuration of the source " +
+            "code repository. This configuration can be used to perform version upgrades of Spring applications." +
+            "Returns the output of the process.";
+    private static final String ADVISOR_BUILD_CONFIG_GET_PARAM = "The full directory path to the source code. Use the " +
+            "path of the current IDE project if possible. If you can not determine the path yourself, ask the user to " +
+            "provide it.";
+
+    @Tool(description = ADVISOR_BUILD_CONFIG_GET)
+    public String advisorBuildConfigGetFunction(@ToolParam(description = ADVISOR_BUILD_CONFIG_GET_PARAM) String pathToSourceCode) {
+        return executeCommand("advisor build-config get -p " + pathToSourceCode);
     }
 
-    public Function<Map<String, Object>, McpSchema.CallToolResult> advisorUpgradePlanGetFunction() {
-        return arguments -> {
-            String pathToSourceCode = (String) arguments.get("pathToSourceCode");
-            return executeCommand("advisor upgrade-plan get -p " + pathToSourceCode);
-        };
+    private static final String ADVISOR_UPGRADE_PLAN_GET = "Get the upgrade plan of the source code repository. " +
+            "This function depends on advisorBuildConfigGet to generate the build configuration file. " +
+            "That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
+            "Returns the output of the process.";
+    private static final String ADVISOR_UPGRADE_PLAN_GET_PARAM = "The full directory path to the source code. Use the " +
+            "path of the current IDE project if possible. If you can not determine the path yourself, ask the user to " +
+            "provide it.";
+
+    @Tool(description = ADVISOR_UPGRADE_PLAN_GET)
+    public String advisorUpgradePlanGetFunction(@ToolParam(description = ADVISOR_UPGRADE_PLAN_GET_PARAM) String pathToSourceCode) {
+        return executeCommand("advisor upgrade-plan get -p " + pathToSourceCode);
     }
 
-    public Function<Map<String, Object>, McpSchema.CallToolResult> advisorUpgradePlanApplyFunction() {
-        return arguments -> {
-            String pathToSourceCode = (String) arguments.get("pathToSourceCode");
-            return executeCommand("advisor upgrade-plan apply -p " + pathToSourceCode);
-        };
+    private static final String ADVISOR_UPGRADE_PLAN_APPLY = "Apply the first step of the upgrade plan of the source code repository. " +
+            "This function depends on advisorBuildConfigGet to generate the build-configuration file. " +
+            "That command must be executed first if the file in the relative project path: target/.advisor/build-config.json does not exist. " +
+            "Verify with the user before performing the apply. " +
+            "Use this method to perform all version upgrades of Spring applications. Returns the output of the process.";
+    private static final String ADVISOR_UPGRADE_PLAN_APPLY_PARAM = "The full directory path to the source code. Use the " +
+            "path of the current IDE project if possible. If you can not determine the path yourself, ask the user to " +
+            "provide it.";
+
+    @Tool(description = ADVISOR_UPGRADE_PLAN_APPLY)
+    public String advisorUpgradePlanApplyFunction(@ToolParam(description = ADVISOR_UPGRADE_PLAN_APPLY_PARAM) String pathToSourceCode) {
+        return executeCommand("advisor upgrade-plan apply -p " + pathToSourceCode);
     }
 
-    private McpSchema.CallToolResult executeCommand(String command) {
-        boolean isError = false;
+    private String executeCommand(String command) {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("sh", "-c", command);
         processBuilder.redirectErrorStream(true);
@@ -57,8 +73,7 @@ public class AppAdvisorFunctions {
                 }
             }
         } catch (IOException e) {
-            return new McpSchema.CallToolResult(List.of(
-                    new McpSchema.TextContent("Could not create process executor: " + e.getMessage())), true);
+            throw new RuntimeException("Could not create process executor: " + e.getMessage());
         }
 
         // Wait for the process to complete and get exit code
@@ -66,15 +81,12 @@ public class AppAdvisorFunctions {
         try {
             exitCode = process.waitFor();
         } catch (InterruptedException e) {
-            return new McpSchema.CallToolResult(List.of(
-                    new McpSchema.TextContent(output.toString()),
-                    new McpSchema.TextContent("Process was interrupted: " + e.getMessage())), true);
+            throw new RuntimeException("Process was interrupted: " + e.getMessage());
         }
         if (exitCode != 0) {
-            isError = true;
-            output.append("Process did not complete successfully. Exit code: ").append(exitCode).append("\n");
+            throw new RuntimeException("Process did not complete successfully. Exit code: " + exitCode);
         }
 
-        return new McpSchema.CallToolResult(List.of(new McpSchema.TextContent(output.toString())), isError);
+        return output.toString();
     }
 }
