@@ -24,7 +24,7 @@ You will need to supply a configuration for the server for your MCP Client. Here
     "app-advisor": {
       "command": "java",
       "args": [
-        "-Dtransport.mode=stdio", "-Dlogging.file.name=app-advisor-mcp.log", "-jar" ,
+        "-Dspring.ai.mcp.server.transport=stdio", "-Dlogging.file.name=app-advisor-mcp.log", "-jar" ,
         "/Users/pcorby/Projects/OpenAI/app-advisor-mcp/target/app-advisor-mcp-0.0.1-SNAPSHOT.jar",
         "--server.port=8041"
       ],
